@@ -17,23 +17,27 @@ string  replace_verb_line(string ligne, int len, string res)
 {   
     int verb = ligne.find("\\verb");
     int emph = ligne.find("\\emph");
-    if ((verb <= len) && (verb >= 0))
+    if (((verb <= len-4) && (verb >= 0)) || ((emph <= len) && (emph >= 0)))
     { 
-        string  sub1 = ligne.substr(0, verb);
-        string  sub2 = ligne.substr(verb+6, len);
-        int     end = sub2.find("|");
-        string sub3 = sub2.substr(0, end);
-        string sub4 = sub2.substr(end+1, sub2.length());
+        if ((verb <= len-4) && (verb >= 0))
+        {
+            string  sep = ligne.substr(verb+5,1);
+            string  sub1 = ligne.substr(0, verb);
+            string  sub2 = ligne.substr(verb+6, len);
+            int     end = sub2.find(sep);
+            string  sub3 = sub2.substr(0, end);
+            string  sub4 = sub2.substr(end+1, sub2.length());
         return (replace_verb_line(sub4, len, res + sub1 + "<code class='codeb'>" + sub3 + "</code>"));
-    }
-    else if ((emph <= len) && (emph >= 0))
-    { 
-        string  sub1 = ligne.substr(0, emph);
-        string  sub2 = ligne.substr(emph+6, len);
-        int     end = sub2.find("}");
-        string sub3 = sub2.substr(0, end);
-        string sub4 = sub2.substr(end+1, sub2.length());
-        return (replace_verb_line(sub4, len, res + sub1 + "<em>" + sub3 + "</em>"));
+        }
+        else if ((emph <= len) && (emph >= 0))
+        { 
+            string  sub1 = ligne.substr(0, emph);
+            string  sub2 = ligne.substr(emph+6, len);
+            int     end = sub2.find("}");
+            string  sub3 = sub2.substr(0, end);
+            string  sub4 = sub2.substr(end+1, sub2.length());
+            return  (replace_verb_line(sub4, len, res + sub1 + "<em>" + sub3 + "</em>"));
+        }
     }
     else
     {
