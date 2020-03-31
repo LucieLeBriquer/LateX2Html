@@ -1,0 +1,52 @@
+\newpage
+\section{Shell}
+
+\subsection{Quelques commandes}
+\begin{itemize}
+    \item \verb|man -f| : recherche dans tous les registres
+    \item existence de \verb|rmdir| au lieu de \verb|rm -rf|
+    \item \verb|wc| : wildcard, nombre de lignes, mots, bytes
+    \item \verb|env| affiche l'ensemble des variables environnements, une variable créée n'est pas commune à plusieurs shell, il faut l'export si on veut pouvoir l'utiliser
+    \item \verb|more| : pagine pour un long fichier, et on peut utiliser \verb|/| pour rechercher comme dans \verb|vim|
+    \item \verb|head -n| : récupère les \verb|n| premières lignes 
+    \item \verb|head -c| : récupère les \verb|n| premiers charactères
+    \item \verb|tail| : fonctionne de la même façon
+    \item \verb|grep| : recherche un motif, \verb|-v| pour afficher les lignes qui ne contiennent pas, \verb|-i| pour ignorer la casse, \verb|-n| pour afficher aussi les numéros lignes contenant le motif
+    \item \verb|sed 's/motif/remplacement/g'| : remplace toutes les occurences de \verb|motif| par \verb|remplacement|
+    \item \verb|chmod| pour changer les droits
+    \item \verb|touch| créé un fichier, \verb|touch -t 07151997 fichier| pour modifier la date
+    \item \verb|for i in `seq 0 9` ; do ... ; done|
+    \item \verb|ln -h| pour créer un hardlink, \verb|ln -n| pour un lien symbolique
+    \item \verb|ls -t| pour trier par ordre de dernière modification
+    \item \verb|find . \( -type d -o -type f \)| trouver tous les dossiers et fichiers réguliers
+\end{itemize}
+
+\subsection{Sorties et écriture de fichiers}
+\begin{itemize}
+    \item \verb|stdin| est l'entrée standard de la commande lancée, une commande peut écrire sur deux types de sorties \verb|stdout| (sortie standard) et \verb|stderr| (sortie d'erreur)
+    \item \verb||| branche la sortie standard sur l'entrée standard
+    \item \verb|>| pour rediriger la sortie standard
+    \item \verb|2>| pour rediriger la sortie d'erreur
+    \item les deux peuvent s'enchaîner
+    \item on peut aussi faire \verb|grep bl < fichier|
+    \item \verb|>>| ajoute au fichier plutôt que de l'écraser
+    \item \verb|<<| écrire jusqu'au mot choisi :
+        \begin{verbatim}
+        cat << FIN
+        > ...
+        > ...
+        > FIN
+        \end{verbatim}
+    \item \verb|2<&1| pour rediriger la sortie d'erreur sur la sortie standard, pour des raisons techniques pour tout rediriger dans un fichier \verb|ls -l > fichier 2>&1|
+\end{itemize}
+
+\subsection{Remarques}
+\begin{itemize}
+    \item \verb|'  '| inhibe tout contrairement à \verb|"  "| pour lequel \verb|"$truc"| affiche \verb|machin|
+    \item fichier magic pour écrire des conditions recherchées sur un fichier
+        \begin{verbatim}
+        offset  type    motif   message
+        \end{verbatim}
+        compiler ce fichier avec \verb|file -C -m fichier_magique| puis tester le fichier avec
+        \\ \verb|file -m magic_file monfichier|
+\end{itemize}
