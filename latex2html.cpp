@@ -3,9 +3,20 @@
 #include <string>
 using namespace std;
 
+void findAndReplaceAll(string & data, string toSearch, string replaceStr)
+{
+	size_t pos = data.find(toSearch);
+	while( pos != string::npos)
+	{
+		data.replace(pos, toSearch.size(), replaceStr);
+		pos = data.find(toSearch, pos + replaceStr.size());
+	}
+}
+
 string  replace_verb_line(string ligne, int len, string res)
 {   
     int verb = ligne.find("\\verb");
+    int emph = ligne.find("\\emph");
     if ((verb <= len) && (verb >= 0))
     { 
         string  sub1 = ligne.substr(0, verb);
@@ -14,6 +25,15 @@ string  replace_verb_line(string ligne, int len, string res)
         string sub3 = sub2.substr(0, end);
         string sub4 = sub2.substr(end+1, sub2.length());
         return (replace_verb_line(sub4, len, res + sub1 + "<code class='codeb'>" + sub3 + "</code>"));
+    }
+    else if ((emph <= len) && (emph >= 0))
+    { 
+        string  sub1 = ligne.substr(0, emph);
+        string  sub2 = ligne.substr(emph+6, len);
+        int     end = sub2.find("}");
+        string sub3 = sub2.substr(0, end);
+        string sub4 = sub2.substr(end+1, sub2.length());
+        return (replace_verb_line(sub4, len, res + sub1 + "<em>" + sub3 + "</em>"));
     }
     else
     {
@@ -75,6 +95,10 @@ void     convert_to_html(string file)
         string ligne;
         while(getline(fichier, ligne))
         {
+	    findAndReplaceAll(ligne, "$", "");
+	    findAndReplaceAll(ligne, "&", "&#38;");
+	    findAndReplaceAll(ligne, "<", "&#8249;");
+	    findAndReplaceAll(ligne, ">", "&#8250;");
             size_t  len = ligne.length();
             int     cpt = 0;
             while (cpt < len)
@@ -82,26 +106,22 @@ void     convert_to_html(string file)
                 if (ligne.find("\\begin{itemize}") == cpt)
                 {
                     sortie1 << "<ul>" << endl;
-                    break;
                 }
                 else if (ligne.find("\\end{itemize}") == cpt)
                 {
                     sortie1 << endl << "</ul>" << endl;
-                    break;
                 }
                 else if (ligne.find("\\item") == cpt)
                 {
-                    string sub1 = ligne.substr(0, cpt - 1);
-                    string sub2 = ligne.substr(cpt + 6, len);
-                    sortie1 << sub1 << "<li>" << sub2 << "</li>" << endl;
-                    break;
+                    string sub2 = ligne.substr(cpt + 6, len - cpt);
+                    sortie1 << "<li>" << sub2 << "</li>" << endl;
                 }
                 cpt++;
             }
             if (ligne.find("\\section") == 0)
             {
                 string sub1 = ligne.substr(9, len - 10);
-                sortie1 << "<h2>" << sub1 << "</h2>" << endl;
+                sortie1 << "<span class=\"ancre\" id=\"" << file << "\"></span>" << endl << "<h2>" << sub1 << "</h2>" << endl;
             }
             else if (ligne.find("\\subsection") == 0)
             {
@@ -109,9 +129,12 @@ void     convert_to_html(string file)
                 sortie1 << "<h3>" << sub1 << "</h3>" << endl;
             }
             else if ((ligne.find("\\newpage") == 0) ||
-                    (ligne.find("\\begin{itemize}") != -1)|| 
-                    (ligne.find("\\item") != -1)|| 
-                    (ligne.find("\\end{itemize}") != -1))
+                    (ligne.find("\\begin{itemize}") != -1) ||
+                    (ligne.find("\\end{itemize}") != -1) ||
+                    (ligne.find("\\item") != -1) ||
+                    (ligne.find("\\dd") == 0) ||
+                    (ligne.find("\\dl") == 0) ||
+                    (ligne.find("\\ni") == 0))
             {
             }
             else
